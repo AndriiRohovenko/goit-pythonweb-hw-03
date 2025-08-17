@@ -7,6 +7,9 @@ RUN pip install -r requirements.txt
 
 COPY .. .
 
+VOLUME ["/app/storage"]
+
 EXPOSE 3000
+
 
 CMD ["python", "main.py"]
