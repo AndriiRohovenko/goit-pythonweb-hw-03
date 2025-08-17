@@ -2,7 +2,11 @@ import mimetypes
 import pathlib
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import urllib.parse
-from storage.filesManagement import write_data_to_file
+from storage.filesManagement import write_data_to_file, storage_path
+from jinja2 import Environment, FileSystemLoader
+import json
+
+env = Environment(loader=FileSystemLoader("."))
 
 
 class HttpHandler(BaseHTTPRequestHandler):
@@ -29,6 +33,19 @@ class HttpHandler(BaseHTTPRequestHandler):
             self.send_html_file("message.html")
 
         elif pr_url.path == "/read":
+            template = env.get_template("read-template.html")
+            with open(storage_path, "r") as file:
+                persons = json.load(file)
+                items = []
+                for timestamp, info in persons.items():
+                    items.append(f"{timestamp}, {info['username']}, {info['message']}")
+                print(items)
+            output = template.render(
+                data=items,
+            )
+            with open("read.html", "w", encoding="utf-8") as fh:
+                fh.write(output)
+
             self.send_html_file("read.html")
         else:
             if pathlib.Path().joinpath(pr_url.path[1:]).exists():
