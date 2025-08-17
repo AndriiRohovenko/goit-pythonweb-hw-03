@@ -2,6 +2,7 @@ import mimetypes
 import pathlib
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import urllib.parse
+from storage.filesManagement import write_data_to_file
 
 
 class HttpHandler(BaseHTTPRequestHandler):
@@ -14,6 +15,8 @@ class HttpHandler(BaseHTTPRequestHandler):
             key: value for key, value in [el.split("=") for el in data_parse.split("&")]
         }
         print(data_dict)
+
+        write_data_to_file(data_dict)
         self.send_response(302)
         self.send_header("Location", "/")
         self.end_headers()
@@ -24,6 +27,9 @@ class HttpHandler(BaseHTTPRequestHandler):
             self.send_html_file("index.html")
         elif pr_url.path == "/message":
             self.send_html_file("message.html")
+
+        elif pr_url.path == "/read":
+            self.send_html_file("read.html")
         else:
             if pathlib.Path().joinpath(pr_url.path[1:]).exists():
                 self.send_static()
